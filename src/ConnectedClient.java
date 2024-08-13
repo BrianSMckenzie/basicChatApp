@@ -3,6 +3,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ConnectedClient {
 
@@ -18,7 +19,7 @@ public class ConnectedClient {
         this.id = id;
     }
 
-    public void getMessages(ArrayList<ConnectedClient> connectedClients) throws IOException {
+    public void getMessages(CopyOnWriteArrayList<ConnectedClient> connectedClients) throws IOException {
         in = new DataInputStream(socket.getInputStream());
         while (!closed) {
 
@@ -35,7 +36,7 @@ public class ConnectedClient {
         }
     }
 
-    public void sendMessage(ArrayList<ConnectedClient> connectedClients) throws IOException {
+    public void sendMessage(CopyOnWriteArrayList<ConnectedClient> connectedClients) throws IOException {
         for(ConnectedClient connectedClient : connectedClients) {
             if(connectedClient.id != id){
                 out = new DataOutputStream(connectedClient.socket.getOutputStream());

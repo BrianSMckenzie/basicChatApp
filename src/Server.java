@@ -44,7 +44,7 @@ public class Server {
 
     private void checkUsers() throws IOException {
         if (connectedClients.isEmpty()) {
-            System.out.printl           n("no clients connected");
+            System.out.println("no clients connected");
             Scanner scanner = new Scanner(System.in);
                 System.out.print("Enter 1 to close the server: ");
             int choice = scanner.nextInt();

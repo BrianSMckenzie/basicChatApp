@@ -16,7 +16,7 @@ public class Server {
 
     Server(){
         try{
-            server = new ServerSocket(8080);
+            server = new ServerSocket(1234);
             acceptConnection();
         }catch(IOException e){
             System.out.println("error: " + e.getMessage());
@@ -30,21 +30,23 @@ public class Server {
             new Thread(() -> {
                 try {
                     ConnectedClient client = new ConnectedClient(socket, connectedClients.size());
+                    System.out.println("Client connected: " + client.id);
                     connectedClients.add(client);
 
-                    System.out.println("user" + client.id + " has joined the server");
+                    client.getUserName();
+
+                    System.out.println("user" + client.id + " (" + client.username + ")"+ " has joined the server");
 
                     // this method loops until client quits server
-                            client.getMessages(connectedClients);
+                    client.getMessages(connectedClients);
 
                     // remove client from connected list if they quit
                     connectedClients.remove(client);
-
                     // checks if last removed user was last one on server
                     checkUsers();
 
                 }   catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("error: " + e.getMessage());
                 }
             }).start();
         }

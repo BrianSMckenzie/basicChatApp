@@ -75,7 +75,12 @@ public class ConnectedClient {
             }
         }
         if (message.equals("/users")) {
-            out.writeUTF(this.usersInRoom.toString());
+            if(!this.usersInRoom.isEmpty()) {
+                out.writeUTF(this.usersInRoom.toString());
+            }
+            else {
+                out.writeUTF("you are all alone");
+            }
         }
     }
     private void close() throws IOException {

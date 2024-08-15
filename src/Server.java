@@ -9,6 +9,7 @@ public class Server {
     private ServerSocket server;
     public CopyOnWriteArrayList<ConnectedClient> connectedClients = new CopyOnWriteArrayList<>();
     private Socket socket;
+    public static int[] roomNums = {1,2,3};
 
     public static void main(String[] args) {
        new Server();
@@ -16,7 +17,7 @@ public class Server {
 
     Server(){
         try{
-            server = new ServerSocket(1234);
+            server = new ServerSocket(8080);
             acceptConnection();
         }catch(IOException e){
             System.out.println("error: " + e.getMessage());
@@ -35,7 +36,9 @@ public class Server {
 
                     client.getUserName();
 
-                    System.out.println("user" + client.id + " (" + client.username + ")"+ " has joined the server");
+                    client.setChatRoom();
+
+                    System.out.println("user" + client.id + " (" + client.username + ")"+ " (" + client.room + ")" + " has joined the server");
 
                     // this method loops until client quits server
                     client.getMessages(connectedClients);

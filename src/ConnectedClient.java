@@ -27,7 +27,6 @@ public class ConnectedClient {
     }
 
     public void getUserName() throws IOException {
-       // out.writeUTF(Arrays.toString(Server.roomNums));
         username = in.readUTF();
     }
 

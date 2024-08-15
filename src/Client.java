@@ -71,7 +71,6 @@ public class Client {
                 out.writeUTF(message);
                 disconnect();
             }
-
             if(message.equals("/users")) {
                 out.writeUTF(message);
             }

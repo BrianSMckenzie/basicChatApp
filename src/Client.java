@@ -6,6 +6,8 @@ public class Client {
     private Socket socket;
     private DataOutputStream out;
     private DataInputStream in;
+    private Scanner scanner;
+    private boolean connected = false;
 
     public static void main(String[] args) {
         new Client();
@@ -14,7 +16,11 @@ public class Client {
     Client() {
         try{
             socket = new Socket("localhost", 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new DataInputStream(socket.getInputStream());
+            scanner = new Scanner(System.in);
             setUsername();
+            chooseChatRoom();
             new Thread(() -> {
                 try {
                     getMessages();
@@ -28,9 +34,22 @@ public class Client {
         }
     }
 
+    private void chooseChatRoom() throws IOException {
+        //String rooms = in.readUTF();
+        //System.out.println(rooms);
+        while(true){
+            System.out.print("Choose a chat room 1-5: ");
+            int temp = scanner.nextInt();
+            System.out.println("Do you want to join room " + temp + " (y/n): ");
+            if (scanner.next().equalsIgnoreCase("y")) {
+                out.writeInt(temp);
+                connected = true;
+                break;
+            }
+        }
+    }
+
     private void setUsername() throws IOException {
-        out = new DataOutputStream(socket.getOutputStream());
-        Scanner scanner = new Scanner(System.in);
         while(true) {
             System.out.print("Please enter your username: ");
             String temp = scanner.nextLine();
@@ -42,32 +61,33 @@ public class Client {
         }
     }
 
+    // sends messages to the server
     @SuppressWarnings("InfiniteLoopStatement")
     private void sendMessages() throws IOException {
         while(true) {
-            out = new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
-            Scanner scanner = new Scanner(System.in);
-            //System.out.print("Enter: ");
             String message = scanner.nextLine();
 
-            if(message.equals("quit")) {
+            if(message.equals("/quit")){
                 out.writeUTF(message);
                 disconnect();
             }
 
-            out.writeUTF(message);
-
+            if(message.equals("/users")) {
+                out.writeUTF(message);
+            }
+            else{
+                out.writeUTF(message);
+            }
         }
     }
 
+    // prints messages from other users in the server
     @SuppressWarnings("InfiniteLoopStatement")
     private void getMessages() throws IOException {
         while(true) {
-            if (in != null) {
+            if (connected) {
                 String incomingMessage = in.readUTF();
                 System.out.println(incomingMessage);
-                //System.out.print("Enter: ");
             }
         }
     }
@@ -77,5 +97,4 @@ public class Client {
         out.close();
         socket.close();
     }
-
 }

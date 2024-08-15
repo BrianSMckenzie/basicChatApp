@@ -6,8 +6,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
 
-    private ServerSocket server;
+    public static int[] roomNums = {1,2,3,4,5};
     public CopyOnWriteArrayList<ConnectedClient> connectedClients = new CopyOnWriteArrayList<>();
+
+    private ServerSocket server;
     private Socket socket;
 
     public static void main(String[] args) {
@@ -15,7 +17,7 @@ public class Server {
     }
 
     Server(){
-        try{
+        try{        
             server = new ServerSocket(1234);
             acceptConnection();
         }catch(IOException e){
@@ -35,18 +37,22 @@ public class Server {
 
                     client.getUserName();
 
-                    System.out.println("user" + client.id + " (" + client.username + ")"+ " has joined the server");
+                    // user choose chat room (need to add way for user to see how many users connected to each room.)
+                    client.setChatRoom();
 
+                    System.out.println("user" + client.id + " (" + client.username + ")"+ " (" + client.room + ")" + " has joined the server");
                     // this method loops until client quits server
                     client.getMessages(connectedClients);
 
                     // remove client from connected list if they quit
                     connectedClients.remove(client);
+
                     // checks if last removed user was last one on server
                     checkUsers();
 
                 }   catch (IOException e) {
                     System.out.println("error: " + e.getMessage());
+                    System.out.println("accept connection shit the bed or something idk (most likely client closed without proper quit)");
                 }
             }).start();
         }
@@ -56,7 +62,7 @@ public class Server {
         if (connectedClients.isEmpty()) {
             System.out.println("no clients connected");
             Scanner scanner = new Scanner(System.in);
-                System.out.print("Enter 1 to close the server: ");
+            System.out.print("Enter 1 to close the server: ");
             int choice = scanner.nextInt();
             if (choice == 1) {
                 server.close();

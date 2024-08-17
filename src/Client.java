@@ -66,17 +66,11 @@ public class Client {
     private void sendMessages() throws IOException {
         while(true) {
             String message = scanner.nextLine();
-
             if(message.equals("/quit")){
                 out.writeUTF(message);
                 disconnect();
             }
-            if(message.equals("/users")) {
-                out.writeUTF(message);
-            }
-            else{
-                out.writeUTF(message);
-            }
+            out.writeUTF(message);
         }
     }
 

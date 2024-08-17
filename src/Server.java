@@ -2,11 +2,15 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
 
     public static int[] roomNums = {1,2,3,4,5};
+    public ConcurrentHashMap<Integer, Set<Integer>> rooms = new ConcurrentHashMap<>();
+    // implement this eventually
     public CopyOnWriteArrayList<ConnectedClient> connectedClients = new CopyOnWriteArrayList<>();
 
     private ServerSocket server;
@@ -41,6 +45,7 @@ public class Server {
                     client.setChatRoom();
 
                     System.out.println("user" + client.id + " (" + client.username + ")"+ " (" + client.room + ")" + " has joined the server");
+
                     // this method loops until client quits server
                     client.getMessages(connectedClients);
 
@@ -49,7 +54,7 @@ public class Server {
 
                     // checks if last removed user was last one on server
                     checkUsers();
-
+    
                 }   catch (IOException e) {
                     System.out.println("error: " + e.getMessage());
                     System.out.println("accept connection shit the bed or something idk (most likely client closed without proper quit)");

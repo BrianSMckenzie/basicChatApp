@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -16,12 +17,12 @@ public class ConnectedClient {
     private final DataInputStream in;
     private final DataOutputStream out;
     private String message;
-    private List<String> usersInRoom;
+   // private final List<String> usersInRoom;
 
     ConnectedClient(Socket socket, int id) throws IOException {
         this.socket = socket;
         this.id = id;
-        usersInRoom = new CopyOnWriteArrayList<>();
+       // usersInRoom = new CopyOnWriteArrayList<>();
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
     }
@@ -31,8 +32,8 @@ public class ConnectedClient {
     }
 
     public void setChatRoom() throws IOException {
-        //out.writeUTF(Arrays.toString(Server.roomNums));
-        int room = in.readInt();
+        //out.writeUTF(Arrays.toString(Server           .roomNums));
+        room = in.readInt();
         if(room > Server.roomNums.length || room < 1) {
             quit = true;
             System.out.println("Invalid room fuck off");
@@ -53,7 +54,7 @@ public class ConnectedClient {
                 this.close();
             }
             else {
-                System.out.println("User" + id + " (" + username + "): " + message);
+                System.out.println("User" + id + " (" + username + ")" + " (" + room + "): " + message);
                 sendMessage(connectedClients);
             }
         }
@@ -61,22 +62,23 @@ public class ConnectedClient {
 
     // this one sends the incoming clients messages to every other client connected to the server
     public void sendMessage(CopyOnWriteArrayList<ConnectedClient> connectedClients) throws IOException {
+        List<String> usersInRoom = new ArrayList<>(); // there is a better way to do this but this works for rn
         for (ConnectedClient connectedClient : connectedClients) {
-            if (connectedClient.id != id && connectedClient.room == this.room && connectedClient.username != null)  {
+            if (connectedClient.id != id && (connectedClient.room == room && connectedClient.username != null))  {
                 DataOutputStream outOthers = new DataOutputStream(connectedClient.socket.getOutputStream());
                 if(message.equals("/users")) {
-                    this.usersInRoom.add(connectedClient.username);
+                    usersInRoom.add(connectedClient.username);
                 } else if (this.quit) {
-                    outOthers.writeUTF("\n" + username + " has left the server");
+                    outOthers.writeUTF(username + " has left the server");
                 }
                 else {
-                    outOthers.writeUTF("\n" + username + ": " +  message);
+                    outOthers.writeUTF(username + ": " +  message);
                 }
             }
         }
         if (message.equals("/users")) {
-            if(!this.usersInRoom.isEmpty()) {
-                out.writeUTF(this.usersInRoom.toString());
+            if(!usersInRoom.isEmpty()) {
+                out.writeUTF(usersInRoom.toString());
             }
             else {
                 out.writeUTF("you are all alone");
